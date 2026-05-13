@@ -125,7 +125,7 @@ def inicializar_ia():
     """
     
     # 4. Crear el modelo
-    modelo = genai.GenerativeModel('gemini-1.5-pro', system_instruction=instruccion)
+    modelo = genai.GenerativeModel('gemini-1.5-flash', system_instruction=instruccion)
     return modelo
 
 try:
