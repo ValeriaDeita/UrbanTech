@@ -5,7 +5,7 @@ import json
 import joblib
 import streamlit.components.v1 as components
 import base64
-import google.generativeai as genai # <- NUEVA LIBRERÍA DE IA
+import google.generativeai as genai
 
 # --- 1. CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(page_title="UrbanTech Copilot", page_icon="🏙️", layout="wide")
@@ -98,34 +98,35 @@ st.markdown(f"""
     <div class="logo-container">{logo_img_html}</div>
     <div class="header-text">
         <h1>UrbanTech Copilot</h1>
-        <p style='color: #00ffff; font-weight: bold; margin:0;'>MINERÍA DE DATOS | FES ACATLÁN</p>
-        <p style='color: #888; margin:0;'>Equipo: Denisse, Martinez, Samu, Dei</p>
+        <p style='color: #888; margin:0; font-size: 0.9em;'>Equipo: Denisse, Alan, Josua, Samuel, Deita, Jesus, Frida</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# --- 5. CARGA DE DATOS Y CONFIGURACIÓN DE GEMINI ---
+# --- 5. CARGA DE DATOS Y BÚSQUEDA AUTOMÁTICA DE MODELO ---
 @st.cache_resource
 def inicializar_ia():
-    # 1. Cargar datos locales
     with open('predicciones_2024_con_clusters.json', 'r', encoding='utf-8') as f:
         predicciones = json.load(f)
     
-    # 2. Configurar la API Key desde los secretos de Streamlit
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
     
-    # 3. Inyectar el JSON en las instrucciones base de Gemini para que tenga contexto real
-    contexto_datos = json.dumps(predicciones[:5]) # Pasamos el Top 5 para no saturar la memoria
+    # Buscador dinámico: Encuentra el primer modelo válido en tu cuenta
+    modelo_valido = 'models/gemini-1.5-flash' # Fallback por defecto
+    for m in genai.list_models():
+        if 'generateContent' in m.supported_generation_methods and 'flash' in m.name:
+            modelo_valido = m.name
+            break
+
+    contexto_datos = json.dumps(predicciones[:5])
     instruccion = f"""
-    Eres UrbanTech Copilot, un agente de Inteligencia Artificial basado en Gemini 1.5 Pro, diseñado para el equipo de Minería de Datos. 
-    Tu rol es analizar siniestralidad vial y planeación urbana.
-    Aquí tienes los datos actuales de tu Data Warehouse (clusters de riesgo): {contexto_datos}.
-    Responde preguntas sobre hotspots, crecimiento de sectores y simula impactos climáticos de forma analítica, profesional y concisa. 
-    Si te preguntan por un sector específico o simulación, deduce el impacto usando conocimiento de ciencia de datos urbana.
+    Eres UrbanTech Copilot, un agente de Inteligencia Artificial para análisis de siniestralidad vial y planeación urbana.
+    Tu modelo se considera una 'Distribution of Flow'.
+    Datos actuales del Data Warehouse (clusters de riesgo): {contexto_datos}.
+    Responde preguntas sobre hotspots y simula impactos climáticos de forma analítica, profesional y concisa.
     """
     
-    # 4. Crear el modelo
-    modelo = genai.GenerativeModel('gemini-1.5-flash', system_instruction=instruccion)
+    modelo = genai.GenerativeModel(modelo_valido, system_instruction=instruccion)
     return modelo
 
 try:
@@ -144,7 +145,6 @@ with col_dash:
     <div class="context-box bi-context">
         <b style="color:#00ffff;">El Pulso del Caos:</b> Radiografía de incidentes en CDMX.<br>
         Este tablero procesa el <i>Data Warehouse</i> histórico para identificar patrones espaciales. 
-        Utiliza los filtros superiores para explorar alcaldías o condiciones climáticas.
     </div>
     """, unsafe_allow_html=True)
     
@@ -156,24 +156,18 @@ with col_chat:
     st.markdown("""
     <div class="context-box ai-context">
         <b style="color:#e67e22;">IA al Servicio del Analista:</b><br>
-        Agente basado en <b>Gemini 1.5 Pro</b> con procesamiento de lenguaje natural.
-        <ul>
-            <li>Consulta datos espaciales: <i>"¿Cuál es el Hotspot con mayor crecimiento?"</i></li>
-            <li>Simula escenarios: <i>"¿Cómo afecta la lluvia intensa a las vías primarias?"</i></li>
-        </ul>
+        Consulta datos espaciales o simula escenarios climáticos.
     </div>
     """, unsafe_allow_html=True)
 
     if status_ready:
-        st.success("✅ Conexión con Gemini 1.5 Pro establecida correctamente.")
+        st.success("✅ Motor de Inteligencia Artificial activo.")
     else:
-        st.error(f"⚠️ Error de conexión API: Verifica tus secretos de Streamlit.")
+        st.error(f"⚠️ Error: {error_msg}")
 
-    # Inicializar el historial de chat nativo de Gemini
     if "chat_session" not in st.session_state and status_ready:
         st.session_state.chat_session = modelo_gemini.start_chat(history=[])
 
-    # Mostrar historial en la pantalla
     if "mensajes_ui" not in st.session_state:
         st.session_state.mensajes_ui = []
 
@@ -181,19 +175,19 @@ with col_chat:
         with st.chat_message(m["rol"], avatar="👤" if m["rol"]=="user" else "🤖"):
             st.markdown(m["contenido"])
 
-    # Entrada de texto del usuario
-    if pregunta := st.chat_input("Ej: ¿Cuál es el Hotspot con mayor crecimiento?"):
-        # Mostrar lo que escribió el usuario
+    if pregunta := st.chat_input("Consulta al Copilot..."):
         st.session_state.mensajes_ui.append({"rol": "user", "contenido": pregunta})
         with st.chat_message("user", avatar="👤"):
             st.markdown(pregunta)
 
-        # Generar respuesta real con Gemini
         with st.chat_message("assistant", avatar="🤖"):
             if status_ready:
-                with st.spinner("Procesando consulta con Gemini 1.5 Pro..."):
-                    respuesta_ia = st.session_state.chat_session.send_message(pregunta)
-                    st.markdown(respuesta_ia.text)
-                    st.session_state.mensajes_ui.append({"rol": "assistant", "contenido": respuesta_ia.text})
-            else:
-                st.markdown("La IA no está disponible en este momento.")
+                with st.spinner("Analizando..."):
+                    try:
+                        respuesta_ia = st.session_state.chat_session.send_message(pregunta)
+                        texto_respuesta = respuesta_ia.text
+                    except Exception as e:
+                        texto_respuesta = f"Error al generar respuesta: {str(e)}"
+                    
+                    st.markdown(texto_respuesta)
+                    st.session_state.mensajes_ui.append({"rol": "assistant", "contenido": texto_respuesta})
