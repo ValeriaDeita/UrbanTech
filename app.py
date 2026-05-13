@@ -5,6 +5,7 @@ import json
 import joblib
 import streamlit.components.v1 as components
 import base64
+import google.generativeai as genai # <- NUEVA LIBRERÍA DE IA
 
 # --- 1. CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(page_title="UrbanTech Copilot", page_icon="🏙️", layout="wide")
@@ -21,7 +22,6 @@ def get_base64_of_bin_file(bin_file):
 fondo_b64 = get_base64_of_bin_file("fondo.png")
 logo_b64 = get_base64_of_bin_file("logourban.png")
 
-# CSS para el fondo
 fondo_style = f"""
 <style>
 .stApp {{
@@ -39,11 +39,9 @@ st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Orbitron:wght@500;900&display=swap');
 
-    /* Fuentes y Globales */
     body, .stApp {{ font-family: 'Inter', sans-serif; }}
     [data-testid="stHeader"], [data-testid="stToolbar"] {{ display: none !important; }}
 
-    /* ENCABEZADO IMPACTANTE */
     .hero-header {{
         display: flex;
         align-items: center;
@@ -57,13 +55,10 @@ st.markdown(f"""
         border: 1px solid rgba(230, 126, 34, 0.3);
     }}
     .logo-container img {{
-        height: 150px; /* Logo más grande */
+        height: 150px;
         filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
     }}
-    .header-text {{
-        margin-left: 30px;
-        text-align: left;
-    }}
+    .header-text {{ margin-left: 30px; text-align: left; }}
     .header-text h1 {{
         font-family: 'Orbitron', sans-serif;
         font-size: 3.5em !important;
@@ -72,7 +67,6 @@ st.markdown(f"""
         letter-spacing: 2px;
     }}
 
-    /* PANELES (CONTENEDORES) */
     [data-testid="stColumn"] > div {{
         background-color: rgba(6, 15, 25, 0.92) !important;
         border-radius: 15px !important;
@@ -80,19 +74,9 @@ st.markdown(f"""
         backdrop-filter: blur(10px);
     }}
     
-    /* Panel Dashboard (Azul/Cian) */
-    [data-testid="stColumn"]:nth-child(1) > div {{
-        border: 1px solid #00ffff !important;
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.15);
-    }}
+    [data-testid="stColumn"]:nth-child(1) > div {{ border: 1px solid #00ffff !important; }}
+    [data-testid="stColumn"]:nth-child(2) > div {{ border: 1px solid #e67e22 !important; }}
 
-    /* Panel Chat (Naranja) */
-    [data-testid="stColumn"]:nth-child(2) > div {{
-        border: 1px solid #e67e22 !important;
-        box-shadow: 0 0 20px rgba(230, 126, 34, 0.15);
-    }}
-
-    /* CAJAS DE CONTEXTO */
     .context-box {{
         padding: 15px;
         border-radius: 10px;
@@ -100,20 +84,10 @@ st.markdown(f"""
         font-size: 0.9em;
         line-height: 1.4;
     }}
-    .bi-context {{
-        background: rgba(0, 255, 255, 0.05);
-        border-left: 4px solid #00ffff;
-    }}
-    .ai-context {{
-        background: rgba(230, 126, 34, 0.05);
-        border-left: 4px solid #e67e22;
-    }}
+    .bi-context {{ background: rgba(0, 255, 255, 0.05); border-left: 4px solid #00ffff; }}
+    .ai-context {{ background: rgba(230, 126, 34, 0.05); border-left: 4px solid #e67e22; }}
 
-    /* CHAT INPUT NARANJA */
-    .stChatInputContainer {{
-        border: 1px solid #e67e22 !important;
-        background: #0a1929 !important;
-    }}
+    .stChatInputContainer {{ border: 1px solid #e67e22 !important; background: #0a1929 !important; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -125,37 +99,52 @@ st.markdown(f"""
     <div class="header-text">
         <h1>UrbanTech Copilot</h1>
         <p style='color: #00ffff; font-weight: bold; margin:0;'>MINERÍA DE DATOS | FES ACATLÁN</p>
-        <p style='color: #888; margin:0;'>Equipo: Denisse, Alan, Josua, Samuel, Deita, Jesus, Frida </p>
+        <p style='color: #888; margin:0;'>Equipo: Denisse, Martinez, Samu, Dei</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# --- 5. CARGA DE DATOS ---
+# --- 5. CARGA DE DATOS Y CONFIGURACIÓN DE GEMINI ---
 @st.cache_resource
-def cargar_recursos():
-    modelo = joblib.load('modelo_lightgbm_v20260508_2005.joblib')
+def inicializar_ia():
+    # 1. Cargar datos locales
     with open('predicciones_2024_con_clusters.json', 'r', encoding='utf-8') as f:
         predicciones = json.load(f)
-    return modelo, predicciones
+    
+    # 2. Configurar la API Key desde los secretos de Streamlit
+    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    
+    # 3. Inyectar el JSON en las instrucciones base de Gemini para que tenga contexto real
+    contexto_datos = json.dumps(predicciones[:5]) # Pasamos el Top 5 para no saturar la memoria
+    instruccion = f"""
+    Eres UrbanTech Copilot, un agente de Inteligencia Artificial basado en Gemini 1.5 Pro, diseñado para el equipo de Minería de Datos. 
+    Tu rol es analizar siniestralidad vial y planeación urbana.
+    Aquí tienes los datos actuales de tu Data Warehouse (clusters de riesgo): {contexto_datos}.
+    Responde preguntas sobre hotspots, crecimiento de sectores y simula impactos climáticos de forma analítica, profesional y concisa. 
+    Si te preguntan por un sector específico o simulación, deduce el impacto usando conocimiento de ciencia de datos urbana.
+    """
+    
+    # 4. Crear el modelo
+    modelo = genai.GenerativeModel('gemini-1.5-pro', system_instruction=instruccion)
+    return modelo
 
 try:
-    modelo, predicciones = cargar_recursos()
+    modelo_gemini = inicializar_ia()
     status_ready = True
-except:
+except Exception as e:
     status_ready = False
+    error_msg = e
 
 # --- 6. COLUMNAS ---
 col_dash, col_chat = st.columns([1.6, 1], gap="large")
 
 with col_dash:
     st.markdown("<h2 style='color:#00ffff !important;'>📊 Inteligencia de Negocios (BI)</h2>", unsafe_allow_html=True)
-    
-    # Caja de contexto Dashboard
     st.markdown("""
     <div class="context-box bi-context">
         <b style="color:#00ffff;">El Pulso del Caos:</b> Radiografía de incidentes en CDMX.<br>
         Este tablero procesa el <i>Data Warehouse</i> histórico para identificar patrones espaciales. 
-        Utiliza los filtros superiores para explorar alcaldías o condiciones climáticas y visualizar el impacto en la siniestralidad vial.
+        Utiliza los filtros superiores para explorar alcaldías o condiciones climáticas.
     </div>
     """, unsafe_allow_html=True)
     
@@ -164,50 +153,47 @@ with col_dash:
 
 with col_chat:
     st.markdown("<h2 style='color:#e67e22 !important;'>🤖 Agente Predictivo (IA)</h2>", unsafe_allow_html=True)
-    
-    # Caja de contexto Chat
     st.markdown("""
     <div class="context-box ai-context">
-        <b style="color:#e67e22;">Instrucciones del Copilot:</b><br>
-        Interactúa con el modelo <b>LightGBM</b> entrenado para predicción de riesgos.
+        <b style="color:#e67e22;">IA al Servicio del Analista:</b><br>
+        Agente basado en <b>Gemini 1.5 Pro</b> con procesamiento de lenguaje natural.
         <ul>
-            <li>Consulta zonas: <i>"¿Cuáles son los clusters de mayor riesgo?"</i></li>
-            <li>Simula escenarios: <i>"¿Cómo afecta la lluvia al Cluster 2?"</i></li>
+            <li>Consulta datos espaciales: <i>"¿Cuál es el Hotspot con mayor crecimiento?"</i></li>
+            <li>Simula escenarios: <i>"¿Cómo afecta la lluvia intensa a las vías primarias?"</i></li>
         </ul>
     </div>
     """, unsafe_allow_html=True)
 
     if status_ready:
-        st.success("✅ Motor de Inteligencia Artificial activo.")
+        st.success("✅ Conexión con Gemini 1.5 Pro establecida correctamente.")
     else:
-        st.error("⚠️ Error: No se encontraron los archivos del modelo o predicciones.")
+        st.error(f"⚠️ Error de conexión API: Verifica tus secretos de Streamlit.")
 
-    # Lógica del Chat
-    if "mensajes" not in st.session_state:
-        st.session_state.mensajes = []
+    # Inicializar el historial de chat nativo de Gemini
+    if "chat_session" not in st.session_state and status_ready:
+        st.session_state.chat_session = modelo_gemini.start_chat(history=[])
 
-    for m in st.session_state.mensajes:
+    # Mostrar historial en la pantalla
+    if "mensajes_ui" not in st.session_state:
+        st.session_state.mensajes_ui = []
+
+    for m in st.session_state.mensajes_ui:
         with st.chat_message(m["rol"], avatar="👤" if m["rol"]=="user" else "🤖"):
             st.markdown(m["contenido"])
 
-    if pregunta := st.chat_input("Consulta al Copilot..."):
-        st.session_state.mensajes.append({"rol": "user", "contenido": pregunta})
+    # Entrada de texto del usuario
+    if pregunta := st.chat_input("Ej: ¿Cuál es el Hotspot con mayor crecimiento?"):
+        # Mostrar lo que escribió el usuario
+        st.session_state.mensajes_ui.append({"rol": "user", "contenido": pregunta})
         with st.chat_message("user", avatar="👤"):
             st.markdown(pregunta)
 
+        # Generar respuesta real con Gemini
         with st.chat_message("assistant", avatar="🤖"):
-            p_min = pregunta.lower()
-            if any(x in p_min for x in ["zona", "riesgo", "cluster"]):
-                try:
-                    top = sorted(predicciones, key=lambda x: x.get('riesgo_score', 0), reverse=True)[:3]
-                    res = "📍 **Análisis del Data Warehouse:**\n\n"
-                    for z in top:
-                        res += f"- **Cluster {z['cluster_id']}**: Riesgo {round(z['riesgo_score']*100,1)}%. Factor: {z['top_factores']}\n"
-                except: res = "Error al procesar predicciones."
-            elif "lluvia" in p_min or "llueve" in p_min:
-                res = "🌧️ **Simulación LightGBM:** La lluvia incrementa la probabilidad de incidentes en un **15%** debido al factor *pavimento mojado*."
+            if status_ready:
+                with st.spinner("Procesando consulta con Gemini 1.5 Pro..."):
+                    respuesta_ia = st.session_state.chat_session.send_message(pregunta)
+                    st.markdown(respuesta_ia.text)
+                    st.session_state.mensajes_ui.append({"rol": "assistant", "contenido": respuesta_ia.text})
             else:
-                res = "Hola. Soy UrbanTech Copilot. ¿En qué puedo ayudarte hoy?"
-            
-            st.markdown(res)
-            st.session_state.mensajes.append({"rol": "assistant", "contenido": res})
+                st.markdown("La IA no está disponible en este momento.")

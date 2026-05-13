@@ -3,3 +3,4 @@ pandas
 joblib
 lightgbm
 scikit-learn
+google-generativeai
