@@ -98,7 +98,8 @@ st.markdown(f"""
     <div class="logo-container">{logo_img_html}</div>
     <div class="header-text">
         <h1>UrbanTech Copilot</h1>
-        <p style='color: #888; margin:0; font-size: 0.9em;'>Equipo: Denisse, Alan, Josua, Samuel, Deita, Jesus, Frida</p>
+        <p style='color: #00ffff; font-weight: bold; margin:0; font-size: 1.1em; letter-spacing: 1px;'>MINERÍA DE DATOS | FES ACATLÁN</p>
+        <p style='color: #888; margin:0; font-size: 0.9em; margin-top: 5px;'>Equipo: Denisse, Alan, Josua, Samuel, Deita, Jesus, Frida</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
