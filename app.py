@@ -125,7 +125,7 @@ st.markdown(f"""
     <div class="header-text">
         <h1>UrbanTech Copilot</h1>
         <p style='color: #00ffff; font-weight: bold; margin:0;'>MINERÍA DE DATOS | FES ACATLÁN</p>
-        <p style='color: #888; margin:0;'>Equipo: Denisse, Martinez, Samu, Dei</p>
+        <p style='color: #888; margin:0;'>Equipo: Denisse, Alan, Josua, Samuel, Deita, Jesus, Frida </p>
     </div>
 </div>
 """, unsafe_allow_html=True)
