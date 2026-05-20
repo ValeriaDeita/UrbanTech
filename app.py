@@ -89,44 +89,31 @@ st.markdown(f"""
     .stChatInputContainer {{ border: 1px solid #e67e22 !important; background: #0a1929 !important; }}
 
     /* =========================================
-       ✨ CORRECCIÓN DE CONTRASTE: TEXTO DEL CHAT (INVERTIDO)
+       ✨ ESTILO GLOBAL DEL CHAT (Cajas, Letras y Títulos)
        ========================================= */
 
-    /* 1. Fuerza la transparencia y el borde naranja para TODAS las cajas de mensajes de chat */
+    /* 1. Cajas transparentes con borde naranja */
     [data-testid="stChatMessage"] {{
         background-color: transparent !important;
         border: 2px solid #e67e22 !important;
         border-radius: 10px;
-        padding: 10px;
-        margin-bottom: 10px;
+        padding: 15px !important;
+        margin-bottom: 15px;
     }}
 
-    /* 2. Dirígete específicamente al mensaje del USUARIO (👤) */
-    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatar"] > div > span:empty:before[content="👤"]) p,
-    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatar"] > div > span:empty:before[content="👤"]) li {{
+    /* 2. Letras generales en color BLANCO */
+    [data-testid="stChatMessage"] p,
+    [data-testid="stChatMessage"] li,
+    [data-testid="stChatMessage"] ul,
+    [data-testid="stChatMessage"] ol {{
         color: #ffffff !important;
-        font-weight: 500 !important;
+        font-weight: 400 !important;
         font-size: 1.05em !important;
     }}
 
-    /* Fuerza los títulos (strong) del usuario en Naranja de alta visibilidad */
-    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatar"] > div > span:empty:before[content="👤"]) strong {{
+    /* 3. Títulos y palabras clave (negritas) en color NARANJA */
+    [data-testid="stChatMessage"] strong {{
         color: #e67e22 !important;
-        font-weight: 700 !important;
-    }}
-
-
-    /* 3. Dirígete específicamente al mensaje del AGENTE (🤖) */
-    /* Fuerza el texto del agente en Naranja (comportamiento actual) */
-    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatar"] > div > span:empty:before[content="🤖"]) p,
-    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatar"] > div > span:empty:before[content="🤖"]) li {{
-        color: #e67e22 !important;
-        font-weight: 500 !important;
-    }}
-
-    /* Fuerza los títulos (strong) del agente en Blanco Puro (comportamiento actual) */
-    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatar"] > div > span:empty:before[content="🤖"]) strong {{
-        color: #ffffff !important;
         font-weight: 700 !important;
     }}
 </style>
