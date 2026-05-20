@@ -89,55 +89,29 @@ st.markdown(f"""
     .stChatInputContainer {{ border: 1px solid #e67e22 !important; background: #0a1929 !important; }}
 
     /* =========================================
-       ✨ ESTILO GLOBAL DEL CHAT (Bordes, Radius, Padding)
+       ✨ ESTILO INFALIBLE PARA EL CHAT (Cajas Naranjas y Texto Blanco)
        ========================================= */
+
+    /* 1. Fondo naranja transparente y borde para TODAS las cajas */
     [data-testid="stChatMessage"] {{
-        /* General styles applied to both */
+        background-color: rgba(230, 126, 34, 0.1) !important;
         border: 2px solid #e67e22 !important;
         border-radius: 10px;
         padding: 15px !important;
         margin-bottom: 15px;
     }}
 
-    /* Títulos globales en NARANJA (Negritas) */
+    /* 2. Selector súper agresivo: todo el texto por dentro DEBE ser blanco puro */
+    [data-testid="stChatMessage"],
+    [data-testid="stChatMessage"] * {{
+        color: #ffffff !important;
+        font-size: 1.02em !important;
+    }}
+
+    /* 3. Única excepción: Las negritas (títulos) van en naranja */
     [data-testid="stChatMessage"] strong {{
         color: #e67e22 !important;
-        font-weight: 700 !important;
-    }}
-
-    /* =========================================
-       ✨ ESTILO MENSAJES USUARIO (👤) - TRANSPARENTE
-       ========================================= */
-    [data-testid="stChatMessageUser"] {{
-        background-color: transparent !important; /* Keep user transparent */
-    }}
-
-    [data-testid="stChatMessageUser"] p,
-    [data-testid="stChatMessageUser"] li {{
-        color: #ffffff !important; /* White text for User */
-        font-weight: 400 !important;
-        font-size: 1.05em !important;
-    }}
-
-    /* =========================================
-       ✨ ESTILO MENSAJES AGENTE (🤖) - FONDO NARANJA
-       ========================================= */
-    [data-testid="stChatMessageAssistant"] {{
-        /* Applied desired Transparent Orange background */
-        background-color: rgba(230, 126, 34, 0.1) !important;
-    }}
-
-    [data-testid="stChatMessageAssistant"] p,
-    [data-testid="stChatMessageAssistant"] li {{
-        color: #fff3e0 !important; /* Off-white/Peach text for Agent, better contrast vs orange bg */
-        font-weight: 400 !important;
-        font-size: 1.05em !important;
-    }}
-
-    /* Adjust agent strong tags for starker contrast on peach text */
-    [data-testid="stChatMessageAssistant"] strong {{
-        color: #ffffff !important; /* Pure white for titles/bolding in agent box */
-        font-weight: 700 !important;
+        font-weight: 900 !important;
     }}
 
 </style>
