@@ -189,7 +189,7 @@ with col_dash:
     components.iframe(looker_url, height=700, scrolling=True)
 
 with col_chat:
-    c_titulo, c_boton = st.columns([0.7, 0.5])
+    c_titulo, c_boton = st.columns([0.7, 0.3])
     with c_titulo:
         st.markdown("<h2 style='color:#e67e22 !important;'>🤖 Agente XAI</h2>", unsafe_allow_html=True)
     with c_boton:
