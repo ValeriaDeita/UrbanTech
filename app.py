@@ -92,14 +92,14 @@ st.markdown(f"""
        ✨ ESTILO GLOBAL DEL CHAT (Cajas, Letras y Títulos)
        ========================================= */
 
-    /* 1. Cajas transparentes con borde naranja */
-    [data-testid="stChatMessage"] {{
-        background-color: transparent !important;
+    /* 1. Cajas con fondo naranja translúcido y borde naranja */
+    [data-testid="stChatMessage"] {
+        background-color: rgba(230, 126, 34, 0.15) !important;
         border: 2px solid #e67e22 !important;
         border-radius: 10px;
         padding: 15px !important;
         margin-bottom: 15px;
-    }}
+    }
 
     /* 2. Letras generales en color BLANCO */
     [data-testid="stChatMessage"] p,
@@ -112,10 +112,12 @@ st.markdown(f"""
     }}
 
     /* 3. Títulos y palabras clave (negritas) en color NARANJA */
-    [data-testid="stChatMessage"] strong {{
+    [data-testid="stChatMessage"] strong, 
+    [data-testid="stChatMessage"] b {
         color: #e67e22 !important;
-        font-weight: 700 !important;
-    }}
+        font-weight: 900 !important;
+        background-color: transparent !important; /* Asegura que el fondo del texto sea transparente */
+    }
 </style>
 """, unsafe_allow_html=True)
 
