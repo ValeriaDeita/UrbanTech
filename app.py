@@ -89,31 +89,33 @@ st.markdown(f"""
     .stChatInputContainer {{ border: 1px solid #e67e22 !important; background: #0a1929 !important; }}
 
     /* =========================================
-       ✨ ESTILO INFALIBLE PARA EL CHAT (Cajas Naranjas y Texto Blanco)
+       ✨ ESTILO GLOBAL DEL CHAT (Cajas, Letras y Títulos)
        ========================================= */
 
-    /* 1. Fondo naranja transparente y borde para TODAS las cajas */
+    /* 1. Cajas transparentes con borde naranja */
     [data-testid="stChatMessage"] {{
-        background-color: rgba(230, 126, 34, 0.1) !important;
+        background-color: transparent !important;
         border: 2px solid #e67e22 !important;
         border-radius: 10px;
         padding: 15px !important;
         margin-bottom: 15px;
     }}
 
-    /* 2. Selector súper agresivo: todo el texto por dentro DEBE ser blanco puro */
-    [data-testid="stChatMessage"],
-    [data-testid="stChatMessage"] * {{
+    /* 2. Letras generales en color BLANCO */
+    [data-testid="stChatMessage"] p,
+    [data-testid="stChatMessage"] li,
+    [data-testid="stChatMessage"] ul,
+    [data-testid="stChatMessage"] ol {{
         color: #ffffff !important;
-        font-size: 1.02em !important;
+        font-weight: 400 !important;
+        font-size: 1.05em !important;
     }}
 
-    /* 3. Única excepción: Las negritas (títulos) van en naranja */
+    /* 3. Títulos y palabras clave (negritas) en color NARANJA */
     [data-testid="stChatMessage"] strong {{
         color: #e67e22 !important;
-        font-weight: 900 !important;
+        font-weight: 700 !important;
     }}
-
 </style>
 """, unsafe_allow_html=True)
 
