@@ -32,7 +32,7 @@ fondo_style = f"""
 </style>
 """ if fondo_b64 else ""
 
-# --- 3. CSS MAESTRO: DISEÑO PREMIUM Y CONTRASTES ---
+# --- 3. CSS MAESTRO: DISEÑO PREMIUM Y CONTRASTES PERSONALIZADOS ---
 st.markdown(f"""
 {fondo_style}
 <style>
@@ -87,6 +87,28 @@ st.markdown(f"""
     .ai-context {{ background: rgba(230, 126, 34, 0.1); border-left: 4px solid #e67e22; color: #fff3e0; }}
 
     .stChatInputContainer {{ border: 1px solid #e67e22 !important; background: #0a1929 !important; }}
+
+    /* =========================================
+       ✨ CORRECCIÓN DE CONTRASTE: TEXTO DEL CHAT
+       ========================================= */
+    /* Forzar color naranja de alta visibilidad para párrafos y textos del chat */
+    [data-testid="stChatMessage"] p, [data-testid="stChatMessageContent"] {{
+        color: #e67e22 !important;
+        font-weight: 500 !important;
+        font-size: 1.05em !important;
+    }}
+
+    /* Forzar color naranja en listas ordenadas y desordenadas */
+    [data-testid="stChatMessage"] li, [data-testid="stChatMessage"] ol, [data-testid="stChatMessage"] ul {{
+        color: #e67e22 !important;
+        font-weight: 500 !important;
+    }}
+
+    /* Resaltar textos en negrita (como títulos del agente) en Blanco Puro para romper la monotonía */
+    [data-testid="stChatMessage"] strong {{
+        color: #ffffff !important;
+        font-weight: 700 !important;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -117,7 +139,6 @@ def inicializar_ia():
             modelo_valido = m.name
             break
 
-    # Se inyecta el set completo de predicciones espaciales y valores SHAP como contexto del Agente
     contexto_datos = json.dumps(predicciones[:5])
     instruccion = f"""
     Eres UrbanTech Copilot, un agente experto en Inteligencia Artificial Explicable (XAI) para el análisis de siniestralidad vial y planeación urbana.
@@ -158,7 +179,6 @@ with col_dash:
     st.link_button("↗️ ABRIR DASHBOARD COMPLETO (Nueva Pestaña)", looker_url, type="primary", use_container_width=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
-    # Despliegue limpio del Dashboard interactivo
     components.iframe(looker_url, height=700, scrolling=True)
 
 with col_chat:
@@ -188,7 +208,6 @@ with col_chat:
     if "mensajes_ui" not in st.session_state:
         st.session_state.mensajes_ui = []
 
-    # Renderizado del flujo transaccional del chat
     for m in st.session_state.mensajes_ui:
         with st.chat_message(m["rol"], avatar="👤" if m["rol"]=="user" else "🤖"):
             st.markdown(m["contenido"])
