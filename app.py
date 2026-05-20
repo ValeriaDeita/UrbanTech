@@ -89,23 +89,43 @@ st.markdown(f"""
     .stChatInputContainer {{ border: 1px solid #e67e22 !important; background: #0a1929 !important; }}
 
     /* =========================================
-       ✨ CORRECCIÓN DE CONTRASTE: TEXTO DEL CHAT
+       ✨ CORRECCIÓN DE CONTRASTE: TEXTO DEL CHAT (INVERTIDO)
        ========================================= */
-    /* Forzar color naranja de alta visibilidad para párrafos y textos del chat */
-    [data-testid="stChatMessage"] p, [data-testid="stChatMessageContent"] {{
-        color: #e67e22 !important;
+
+    /* 1. Fuerza la transparencia y el borde naranja para TODAS las cajas de mensajes de chat */
+    [data-testid="stChatMessage"] {{
+        background-color: transparent !important;
+        border: 2px solid #e67e22 !important;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }}
+
+    /* 2. Dirígete específicamente al mensaje del USUARIO (👤) */
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatar"] > div > span:empty:before[content="👤"]) p,
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatar"] > div > span:empty:before[content="👤"]) li {{
+        color: #ffffff !important;
         font-weight: 500 !important;
         font-size: 1.05em !important;
     }}
 
-    /* Forzar color naranja en listas ordenadas y desordenadas */
-    [data-testid="stChatMessage"] li, [data-testid="stChatMessage"] ol, [data-testid="stChatMessage"] ul {{
+    /* Fuerza los títulos (strong) del usuario en Naranja de alta visibilidad */
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatar"] > div > span:empty:before[content="👤"]) strong {{
+        color: #e67e22 !important;
+        font-weight: 700 !important;
+    }}
+
+
+    /* 3. Dirígete específicamente al mensaje del AGENTE (🤖) */
+    /* Fuerza el texto del agente en Naranja (comportamiento actual) */
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatar"] > div > span:empty:before[content="🤖"]) p,
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatar"] > div > span:empty:before[content="🤖"]) li {{
         color: #e67e22 !important;
         font-weight: 500 !important;
     }}
 
-    /* Resaltar textos en negrita (como títulos del agente) en Blanco Puro para romper la monotonía */
-    [data-testid="stChatMessage"] strong {{
+    /* Fuerza los títulos (strong) del agente en Blanco Puro (comportamiento actual) */
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatar"] > div > span:empty:before[content="🤖"]) strong {{
         color: #ffffff !important;
         font-weight: 700 !important;
     }}
