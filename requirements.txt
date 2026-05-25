@@ -3,3 +3,5 @@ groq
 joblib
 pandas
 numpy
+lightgbm
+scikit-learn
