@@ -294,9 +294,16 @@ def filtrar_predicciones(datos, pregunta):
 
 def detectar_modo(pregunta):
     palabras_futuro = [
-        "pasaria", "si lloviera", "que pasaria", "imagina",
-        "simula", "pronostico", "2025", "2026", "2027",
-        "mañana", "este viernes", "este lunes", "proxima semana"
+        "pasaria", "si lloviera", "que pasaria",
+        "imagina", "simula", "pronostico",
+        "2025", "2026", "2027", "2028", "2029", "2030", 
+        "mañana", "este viernes", "este lunes",
+        "proxima semana", "esta semana", "hoy",
+        "esta noche", "junio", "julio", "agosto",        
+        "septiembre", "octubre", "noviembre", "diciembre",
+        "enero", "febrero", "marzo", "abril", "mayo",
+        "seran", "serán", "será", "van a ser",           
+        "prediccion", "predice", "pronostica"
     ]
     for palabra in palabras_futuro:
         if palabra in pregunta.lower():
