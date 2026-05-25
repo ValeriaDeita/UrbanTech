@@ -1,0 +1,72 @@
+{
+  "model_version": "v20260508_2005",
+  "modelo_tipo": "lightgbm",
+  "task_mode": "binario",
+  "best_params": {
+    "subsample": 1.0,
+    "num_leaves": 63,
+    "n_estimators": 600,
+    "max_depth": 15,
+    "learning_rate": 0.05,
+    "colsample_bytree": 1.0,
+    "class_weight": "balanced"
+  },
+  "metricas_test": {
+    "f1": 0.1664386382051725,
+    "recall": 0.7840070078838693,
+    "precision": 0.09310170599774119,
+    "auc": 0.792235227756311,
+    "ap": 0.138814717797984
+  },
+  "feature_cols": [
+    "hora_creacion_int",
+    "hora_creacion_sin",
+    "hora_creacion_cos",
+    "dia_semana_num",
+    "dia_semana_sin",
+    "dia_semana_cos",
+    "es_festivo",
+    "es_quincena",
+    "es_vacaciones_escolares",
+    "hora_pico_flag",
+    "fin_de_semana_flag",
+    "eventos_masivos_flag",
+    "turno",
+    "n_bares",
+    "n_escuelas",
+    "n_teatros",
+    "n_terminales",
+    "nodos_riesgo",
+    "distancia_metro_m",
+    "alcaldia_inicio",
+    "precipitacion",
+    "temperatura",
+    "cobertura_nubes",
+    "indice_afluencia",
+    "categoria_afluencia",
+    "int_lluvia_x_afluencia",
+    "int_horapico_x_lluvia",
+    "int_horapico_x_afluencia",
+    "int_finde_x_eventos",
+    "int_quincena_x_finde"
+  ],
+  "cat_cols": [
+    "turno",
+    "alcaldia_inicio",
+    "categoria_afluencia"
+  ],
+  "fecha_train": [
+    "2019-01-01",
+    "2023-09-30"
+  ],
+  "fecha_test": [
+    "2023-10-01",
+    "2024-02-29"
+  ],
+  "n_train": 1948734,
+  "n_test": 744647,
+  "tasa_positiva_train": 0.16666666666666666,
+  "tasa_positiva_test": 0.042925036963823125,
+  "neg_subsample_ratio": 5,
+  "timestamp_export": "2026-05-09T02:29:03.284914Z"
+}
